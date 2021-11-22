@@ -9,7 +9,7 @@ public interface IDAO<T> {
     T get(int id);
 
     @NotNull
-    List<T> all();
+    List<?> all();
 
     void save(@NotNull T entity);
 

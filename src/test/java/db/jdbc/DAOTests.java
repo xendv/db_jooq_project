@@ -55,7 +55,6 @@ public class DAOTests {
     public void init() {
         MockitoAnnotations.initMocks(this);
         initDB();
-        //Mockito.when(connection.createStatement()).thenReturn(statement);
     }
 
     @After
@@ -98,7 +97,7 @@ public class DAOTests {
         assertArrayEquals(allInvoicesMinusOne.toArray(), invoices.toArray());
     }
 
-    @Test(expected =  IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void deleteNotExistingInvoice(){
         InvoiceDAO invoiceDAO = new InvoiceDAO (connection);
         invoiceDAO.delete(selectedInvoice2);

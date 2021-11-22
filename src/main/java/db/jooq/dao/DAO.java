@@ -1,53 +1,64 @@
 package db.jooq.dao;
 
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
+import org.jetbrains.annotations.NotNull;
+import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.TableImpl;
+import org.jooq.impl.UpdatableRecordImpl;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.List;
 
-public abstract class DAO<E> implements IDAO<E>{
+public abstract class DAO<T> implements IDAO<T> {
 
-        protected String selectAllTemplate = "SELECT * FROM ";
-        protected String deleteTemplate = "DELETE FROM ";
         protected String sql;
 
-        private final Connection connection;
         protected final DSLContext context;
+        protected TableImpl<?> tableGenerated;
+        protected Class<?> recordTypeGenerated;
+        protected Class<T> returnClassType;
+        protected TableField<?, ?> pk;
 
-        public DAO(Connection connection){
-                this.connection = connection;
+        public DAO(Connection connection, TableImpl<?> tableGenerated, Class<T> returnClassType){
                 this.context = DSL.using(connection, SQLDialect.POSTGRES);
+                this.tableGenerated = tableGenerated;
+                this.recordTypeGenerated = tableGenerated.getRecordType();
+                this.returnClassType = returnClassType;
+
+                var p = tableGenerated.getPrimaryKey();
+                if (p!=null)
+                        this.pk = p.getFieldsArray()[0];
         }
 
-        public String tableName;
-        public String primaryKey;
-
-        public PreparedStatement getAllPreparedStatement() {
-                sql = selectAllTemplate + tableName;
-                return getPrepareStatement(sql);
+        @Override
+        @NotNull
+        public List<T> all() {
+                return context.select().from(tableGenerated).fetchInto(returnClassType);
         }
 
-        public PreparedStatement getByIdPreparedStatement() {
-                sql = selectAllTemplate + tableName + " WHERE " + primaryKey + " = ?";
-                return getPrepareStatement(sql);
+        @Override
+        @NotNull
+        public T get(int id){
+                var x = context.selectFrom(tableGenerated).where(((TableField)pk).eq(id)).fetchOne();
+                if (x == null) throw new IllegalStateException("No record found");
+                else return x.into(returnClassType);
         }
 
-        public PreparedStatement deleteDyIdPreparedStatement() {
-                sql = deleteTemplate + tableName + " WHERE " + primaryKey + " = ?";
-                return getPrepareStatement(sql);
+        @Override
+        public void save(@NotNull T entity) {
+                var rec = context.newRecord(tableGenerated, entity);
+                ((UpdatableRecordImpl<?>)rec).store();
         }
 
-        // Получение экземпляра PrepareStatement
-        public PreparedStatement getPrepareStatement(String sql) {
-                PreparedStatement ps = null;
-                try {
-                        ps = connection.prepareStatement(sql);
-                } catch (SQLException e) {
-                        e.printStackTrace();
-                }
-                return ps;
+        @Override
+        public void update(@NotNull T entity) {
+                var rec = context.newRecord(tableGenerated, entity);
+                ((UpdatableRecordImpl<?>)rec).refresh();
+        }
+        @Override
+        public void delete(@NotNull T entity) {
+                var rec = (UpdatableRecord<?>)context.newRecord(tableGenerated, entity);
+                if (context.executeDelete(rec) == 0)
+                        throw new IllegalStateException("No record found");
         }
 }

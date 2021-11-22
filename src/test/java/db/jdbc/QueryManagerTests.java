@@ -44,12 +44,12 @@ public class QueryManagerTests {
     double getAvgPriceByPeriodAnswer = 90.0;
 
     String getProductsAndOrgInPeriodString = "Organisation{itn=1111111, name='ItemsProvider', paymentAccount='111222333'} Product{internalCode=111, name='fork'}\n" +
-            "Organisation{itn=1111111, name='ItemsProvider', paymentAccount='111222333'} Product{internalCode=222, name='spoon'}\n" +
             "Organisation{itn=1111111, name='ItemsProvider', paymentAccount='111222333'} Product{internalCode=111, name='fork'}\n" +
+            "Organisation{itn=1111111, name='ItemsProvider', paymentAccount='111222333'} Product{internalCode=222, name='spoon'}\n" +
             "Organisation{itn=2222222, name='Provider2', paymentAccount='222333444'} Product{internalCode=111, name='fork'}\n" +
             "Organisation{itn=2222222, name='Provider2', paymentAccount='222333444'} Product{internalCode=222, name='spoon'}\n" +
             "Organisation{itn=2222222, name='Provider2', paymentAccount='222333444'} Product{internalCode=333, name='plate'}\n" +
-            "Organisation{itn=3333333, name='Provider3', paymentAccount='333444555'}  shipped no products during this period\n";
+            "Organisation{itn=3333333, name='Provider3', paymentAccount='333444555'} shipped no products during this period\n";
 
     Product forkProduct = new Product(111, "fork");
     Product tableProduct = new Product(444, "table");

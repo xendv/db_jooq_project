@@ -5,13 +5,14 @@ package db.jooq.generated.tables.records;
 
 
 import db.jooq.generated.tables.Invoice;
+
+import java.time.LocalDate;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record3;
 import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import java.time.LocalDate;
 
 
 /**

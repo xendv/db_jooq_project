@@ -5,6 +5,7 @@ package db.jooq.generated.tables.records;
 
 
 import db.jooq.generated.tables.InvoiceItem;
+
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record5;

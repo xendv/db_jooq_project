@@ -12,6 +12,7 @@ import db.jooq.generated.tables.records.InvoiceItemRecord;
 import db.jooq.generated.tables.records.InvoiceRecord;
 import db.jooq.generated.tables.records.OrganizationRecord;
 import db.jooq.generated.tables.records.ProductRecord;
+
 import org.jooq.ForeignKey;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;

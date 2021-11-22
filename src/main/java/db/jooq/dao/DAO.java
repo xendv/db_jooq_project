@@ -1,7 +1,10 @@
 package db.jooq.dao;
 
 import org.jetbrains.annotations.NotNull;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.TableField;
+import org.jooq.UpdatableRecord;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 import org.jooq.impl.UpdatableRecordImpl;

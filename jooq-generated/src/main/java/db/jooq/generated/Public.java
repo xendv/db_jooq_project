@@ -8,12 +8,13 @@ import db.jooq.generated.tables.Invoice;
 import db.jooq.generated.tables.InvoiceItem;
 import db.jooq.generated.tables.Organization;
 import db.jooq.generated.tables.Product;
-import org.jooq.Catalog;
-import org.jooq.Table;
-import org.jooq.impl.SchemaImpl;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.jooq.Catalog;
+import org.jooq.Table;
+import org.jooq.impl.SchemaImpl;
 
 
 /**

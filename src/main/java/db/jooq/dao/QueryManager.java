@@ -3,14 +3,16 @@ package db.jooq.dao;
 import db.jooq.entities.Organization;
 import db.jooq.entities.Product;
 import org.jetbrains.annotations.NotNull;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
 import java.util.*;
-import java.util.Comparator;
 
 import static db.jooq.generated.Tables.*;
 import static org.jooq.impl.DSL.avg;
@@ -82,7 +84,6 @@ public class QueryManager {
             if (productFullQuantity >= productMap.get(tempProduct) && !result.contains(tempOrganization))
                 result.add(tempOrganization);
         }
-
         return result;
     }
 
@@ -90,7 +91,8 @@ public class QueryManager {
     // в указанном периоде, посчитать итоги за период
     @NotNull
     public Map<Product,Map<Integer, Integer>> getQuantityAndSumByPeriod(Date start, Date end){
-        Result<Record4<Integer,String, BigDecimal, BigDecimal>> records = context.select(PRODUCT.INTERNAL_CODE, PRODUCT.NAME,
+        Map<Product,Map<Integer, Integer>> resultMap = new HashMap<>();
+        var records = context.select(PRODUCT.INTERNAL_CODE, PRODUCT.NAME,
                         sum(INVOICE_ITEM.QUANTITY).as(FULL_QUANTITY),
                         sum((INVOICE_ITEM.QUANTITY).multiply(INVOICE_ITEM.PRICE)).as(TOTAL_SUM))
                 .from(PRODUCT)
@@ -98,16 +100,16 @@ public class QueryManager {
                 .join(INVOICE).on(INVOICE.DATE.greaterOrEqual(start.toLocalDate())).and(INVOICE.DATE.lessOrEqual(end.toLocalDate()))
                 .and(INVOICE.ID.eq(INVOICE_ITEM.INVOICE_ID))
                 .groupBy(PRODUCT.INTERNAL_CODE).orderBy(PRODUCT.INTERNAL_CODE)
-                .fetch();
+                .fetchMap(PRODUCT);
 
-        Map<Product,Map<Integer, Integer>> resultMap = new HashMap<>();
-        for (var record: records){
-            Integer quant = ((BigDecimal)record.getValue(FULL_QUANTITY)).intValue();
-            Integer sum = ((BigDecimal)record.getValue(TOTAL_SUM)).intValue();
-            Map<Integer, Integer> indicatorsMap = Map.of(quant, sum);
-            resultMap.put(record.into(PRODUCT).into(Product.class), indicatorsMap);
+        for (var record: records.entrySet()){
+            BigDecimal quantaty = (BigDecimal)record.getValue().get(FULL_QUANTITY);
+            BigDecimal totalSum = (BigDecimal)record.getValue().get(TOTAL_SUM);
+            if (quantaty != null && totalSum != null){
+                Map<Integer, Integer> indicatorsMap = Map.of(quantaty.intValue(), totalSum.intValue());
+                resultMap.put(record.getValue().into(PRODUCT).into(Product.class), indicatorsMap);
+            }
         }
-
         return resultMap;
     }
     // Human-readable version
